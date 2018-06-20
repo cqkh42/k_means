@@ -37,6 +37,15 @@ d3.json("g2-2-100.json").then(function(data) {
           if(this.value == "manual"){alert("Not yet implemented")}
           drawCentroids()
       });
+    
+    d3.select(".slider")
+      .on("change", function(){
+        num_clusters = this.value
+        selectRandom(num_clusters)
+        initial_centeroids = d3.selectAll(".selected").data()
+        drawCenteroids(initial_centeroids)
+      })
+      
       
     d3.selectAll("#startbutton")
       .on("click", function(){
