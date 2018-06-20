@@ -26,8 +26,8 @@ d3.json("g2-2-100.json").then(function(data) {
 
     drawpoints(data)    
     selectRandom(num_clusters)  
-    initial_centeroids = d3.selectAll(".selected").data()
-    drawCenteroids(initial_centeroids)
+    initial_centroids = d3.selectAll(".selected").data()
+    drawCentroids(initial_centroids)
     
         
     d3.selectAll("input[name='start']")
@@ -35,7 +35,7 @@ d3.json("g2-2-100.json").then(function(data) {
           if(this.value == "random"){selectRandom(num_clusters)}
           if(this.value == "k++"){alert("Not yet implemented")}
           if(this.value == "manual"){alert("Not yet implemented")}
-          drawCenteroids()
+          drawCentroids()
       });
       
     d3.selectAll("#startbutton")
@@ -46,8 +46,8 @@ d3.json("g2-2-100.json").then(function(data) {
       
     d3.selectAll("#nextbutton")
       .on("click", function(){
-          var new_coords = calcNewCenteroids()
-          drawCenteroids(new_coords)
+          var new_coords = calcNewCentroids()
+          drawCentroids(new_coords)
           drawBisector()
           assignClusters()
       })
@@ -55,12 +55,12 @@ d3.json("g2-2-100.json").then(function(data) {
         );
                 
 function assignClusters(){
-    var centeroids = d3.selectAll(".centeroid")
+    var centroids = d3.selectAll(".centroid")
       .data()
         
     d3.selectAll(".circ")
       .each(function(d, i) {
-          distances = centeroids.map(function(e) 
+          distances = centroids.map(function(e) 
             {return (e.x - d.x)**2 + (e.y - d.y)**2}
           )
           
@@ -76,23 +76,23 @@ function assignClusters(){
       })
 }
         
-function drawCenteroids(coords) {
-    d3.selectAll(".centeroid").remove();
+function drawCentroids(coords) {
+    d3.selectAll(".centroid").remove();
     cross = d3.symbol().type(d3.symbolCross).size(100)
     d3.select(".chart")
-      .selectAll(".centeroid")
+      .selectAll(".centroid")
       .data(coords)
       .enter()
       .append("path")
       .attr("d", cross())
       .attr("transform", function(d) {
           return 'translate(' + x_scaler(d.x) + ' ' + y_scaler(d.y) + ')'})
-      .classed("centeroid", true)
+      .classed("centroid", true)
       .style("fill", function(d,i){return accent(i+1)})
       .style("stroke", "black")
       }
       
-function calcNewCenteroids() {
+function calcNewCentroids() {
     var coords = []
     for (var i=0; i < num_clusters; i++){
         data = d3.selectAll(".circ")
@@ -119,13 +119,13 @@ function getXBoundary(y, m, c){
 
 function drawBisector() {
     d3.selectAll(".bisector").remove()
-    var centeroids = d3.selectAll(".centeroid")
+    var centroids = d3.selectAll(".centroid")
       .data()
       
-    centre_x = d3.mean(centeroids, function(d){return d.x})
-    centre_y = d3.mean(centeroids, function(d){return d.y})
+    centre_x = d3.mean(centroids, function(d){return d.x})
+    centre_y = d3.mean(centroids, function(d){return d.y})
     
-    m = (centeroids[1].y - centeroids[0].y) / (centeroids[1].x - centeroids[0].x)
+    m = (centroids[1].y - centroids[0].y) / (centroids[1].x - centroids[0].x)
     
     if(m == 0){alert("m is 0")}
     else if(m == Infinity){alert("m is inf")}
