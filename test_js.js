@@ -1,4 +1,3 @@
-var scat
 var x_scaler
 var y_scaler
 var min_x
@@ -6,14 +5,14 @@ var max_x
 var min_y
 var max_y
 var accent = d3.scaleOrdinal(d3.schemeAccent)
+var num_clusters = 2
 
 d3.json("g2-2-100.json").then(function(data) {
-    scat = data
         
-    min_x = d3.min(scat, function(d) {return d.x}) 
-    max_x = d3.max(scat, function(d) {return d.x}) 
-    min_y = d3.min(scat, function(d) {return d.y}) 
-    max_y = d3.max(scat, function(d) {return d.y}) 
+    min_x = d3.min(data, function(d) {return d.x}) 
+    max_x = d3.max(data, function(d) {return d.x}) 
+    min_y = d3.min(data, function(d) {return d.y}) 
+    max_y = d3.max(data, function(d) {return d.y}) 
    
     h = d3.select(".chart").node().width.baseVal.value
     
@@ -25,15 +24,15 @@ d3.json("g2-2-100.json").then(function(data) {
         .domain([min_y - 10, max_y + 10])
         .range([0, h]);
 
-    drawpoints(scat)    
-    selectRandom(2)  
-    initial_centeroids = d3.selectAll(".selected").nodes().map(function(d){return d.__data__})    
+    drawpoints(data)    
+    selectRandom(num_clusters)  
+    initial_centeroids = d3.selectAll(".selected").data()
     drawCenteroids(initial_centeroids)
     
         
     d3.selectAll("input[name='start']")
       .on("change", function(){
-          if(this.value == "random"){selectRandom(2)}
+          if(this.value == "random"){selectRandom(num_clusters)}
           if(this.value == "k++"){alert("Not yet implemented")}
           if(this.value == "manual"){alert("Not yet implemented")}
           drawCenteroids()
@@ -57,8 +56,7 @@ d3.json("g2-2-100.json").then(function(data) {
                 
 function assignClusters(){
     var centeroids = d3.selectAll(".centeroid")
-      .nodes()
-      .map(function(d){return d.__data__})
+      .data()
         
     d3.selectAll(".circ")
       .each(function(d, i) {
@@ -66,16 +64,13 @@ function assignClusters(){
             {return (e.x - d.x)**2 + (e.y - d.y)**2}
           )
           
-          for (var i=0; i < centeroids.length; i++){
+          for (var i=0; i < num_clusters; i++){
               d3.select(this).classed("cluster_" + i, false)
               if (distances[i] == d3.min(distances)){
               d3.select(this)
               .classed("cluster_" + i, true)
-              .attr("fill", accent[i])
-              .attr("stroke", accent[i])
-              .style("fill", accent[i])
-              .style("stroke", accent[i])
-              continue;
+              .style("fill", accent(i+1))
+              .style("stroke", accent(i+1))
               
           }}
       })
@@ -93,21 +88,21 @@ function drawCenteroids(coords) {
       .attr("transform", function(d) {
           return 'translate(' + x_scaler(d.x) + ' ' + y_scaler(d.y) + ')'})
       .classed("centeroid", true)
+      .style("fill", function(d,i){return accent(i+1)})
+      .style("stroke", "black")
       }
       
 function calcNewCenteroids() {
-    num_clusters = d3.selectAll(".centeroid").size()
     var coords = []
     for (var i=0; i < num_clusters; i++){
-        str = function(d){return ".cluster_" + i}
-        nodes = d3.selectAll(".circ")
-          .filter(str())
-          .nodes()
-        x = d3.mean(nodes
-            .map(function(d){return d.__data__.x}))
-        y = d3.mean(nodes
-            .map(function(d){return d.__data__.y}))
-        var coords = coords.concat([{"x":x, "y": y}])
+        data = d3.selectAll(".circ")
+          .filter(".cluster_" + i)
+          .data()
+        x = d3.mean(data
+            .map(function(d){return d.x}))
+        y = d3.mean(data
+            .map(function(d){return d.y}))
+        var coords = coords.concat([{"x": x, "y": y}])
     }
     return coords
 }
@@ -125,11 +120,10 @@ function getXBoundary(y, m, c){
 function drawBisector() {
     d3.selectAll(".bisector").remove()
     var centeroids = d3.selectAll(".centeroid")
-      .nodes()
-      .map(function(d){return d.__data__})       
+      .data()
       
-    centre_x = (centeroids[0].x + centeroids[1].x) / 2
-    centre_y = (centeroids[0].y + centeroids[1].y) / 2    
+    centre_x = d3.mean(centeroids, function(d){return d.x})
+    centre_y = d3.mean(centeroids, function(d){return d.y})
     
     m = (centeroids[1].y - centeroids[0].y) / (centeroids[1].x - centeroids[0].x)
     
@@ -154,15 +148,19 @@ function drawBisector() {
       .append("path")
       .attr("d", d3.line()(a))
       .classed("bisector", true) 
+      .style("stroke", "red")
+      .style("stroke-width", 1)
+    
 }
 
 function selectRandom(size) {
-    d3.selectAll(".circ").classed("selected", false);
-    var nodes = d3.selectAll(".circ").nodes()
+    circs = d3.selectAll(".circ")
+    indices = []
     for(var i = 0; i < size; i++){
-        var index_in_circles = Math.floor(Math.random()*nodes.length);
-        selected_point = d3.select(nodes[index_in_circles]).classed("selected", true);
+        index_in_circles = Math.floor(Math.random()*circs.size());
+        indices = indices.concat([index_in_circles])
     }
+    circs.classed("selected", function(d,i){return indices.includes(i)})
 };
 
 function drawpoints(data) {
@@ -174,5 +172,10 @@ function drawpoints(data) {
       .attr("cx", function(d){return x_scaler(d.x)})
       .attr("cy", function(d){return y_scaler(d.y)})
       .classed("circ", true)
+      .style("stroke", accent(0))
+      .style("r", 5)
+      .style("stroke-width", 1)
+      .style("fill", accent(0))
+      .style("fill-opacity", 0.5)
 }
 
