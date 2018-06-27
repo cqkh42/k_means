@@ -25,27 +25,46 @@ d3.json("g2-2-100.json").then(function(data) {
         .range([0, h]);
 
     drawpoints(data)    
-    selectRandom(num_clusters)  
+    for (var i=0; i < num_clusters; i++){
+        addRandomCentroid()    }
+    
     initial_centroids = d3.selectAll(".selected").data()
     drawCentroids(initial_centroids)
     
         
     d3.selectAll("input[name='start']")
       .on("change", function(){
-          if(this.value == "random"){selectRandom(num_clusters)}
+          if(this.value == "random"){
+              for (var i=0; i < num_clusters; i++){
+              addRandomCentroid()    
+            }
+              }
           if(this.value == "k++"){alert("Not yet implemented")}
           if(this.value == "manual"){alert("Not yet implemented")}
           drawCentroids()
       });
-    
-    d3.select(".slider")
-      .on("change", function(){
-        num_clusters = this.value
-        selectRandom(num_clusters)
-        initial_centeroids = d3.selectAll(".selected").data()
-        drawCenteroids(initial_centeroids)
+
+    d3.select("#addcluster")
+      .on("click", function(){
+          num_clusters += 1          
+          addRandomCentroid()
+          initial_centroids = d3.selectAll(".selected").data()
+          drawCentroids(initial_centroids)
+          d3.select("#clusternumber").text("Number of clusters: " + num_clusters)
       })
       
+      
+    d3.select("#removecluster")
+      .on("click", function(){
+          if (num_clusters > 1){
+          d3.selectAll(".selected")
+            .filter(function(d, i) {return i == num_clusters - 1})
+            .classed("selected", false)
+          num_clusters = num_clusters - 1
+          initial_centroids = d3.selectAll(".selected").data()
+          drawCentroids(initial_centroids)
+          d3.select("#clusternumber").text("Number of clusters: " + num_clusters)}
+      })
       
     d3.selectAll("#startbutton")
       .on("click", function(){
@@ -62,7 +81,19 @@ d3.json("g2-2-100.json").then(function(data) {
       })
 }
         );
-                
+
+function addRandomCentroid(){
+    circs = d3.selectAll(".circ")
+    num_selected = d3.selectAll(".selected").size()
+    index = Math.floor(Math.random()*circs.size());
+    chosen = circs
+      .filter(function(d,i){return i == index})
+    is_selected = chosen.classed("selected")
+
+    str = "selected_" + (num_selected + 1)
+    if (is_selected == true){addRandomCentroid()}
+    else {chosen.classed("selected", true).attr("id", str)}
+}        
 function assignClusters(){
     var centroids = d3.selectAll(".centroid")
       .data()
@@ -97,8 +128,12 @@ function drawCentroids(coords) {
       .attr("transform", function(d) {
           return 'translate(' + x_scaler(d.x) + ' ' + y_scaler(d.y) + ')'})
       .classed("centroid", true)
-      .style("fill", function(d,i){return accent(i+1)})
-      .style("stroke", "black")
+      .style("fill", function(d,i){return accent(i + 1)})
+    // d3.selectAll(".centroid")
+      // .each(function(d,i){d3.select(this).style("fill", accent(i + 2))})
+    
+    // d3.select(".centroid")
+      // .style("fill", function(d){return (accent(d3.select(this).nodes()[0].id.split("_")[1]))})
       }
       
 function calcNewCentroids() {
@@ -162,15 +197,6 @@ function drawBisector() {
     
 }
 
-function selectRandom(size) {
-    circs = d3.selectAll(".circ")
-    indices = []
-    for(var i = 0; i < size; i++){
-        index_in_circles = Math.floor(Math.random()*circs.size());
-        indices = indices.concat([index_in_circles])
-    }
-    circs.classed("selected", function(d,i){return indices.includes(i)})
-};
 
 function drawpoints(data) {
     d3.select(".chart")
