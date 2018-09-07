@@ -2,7 +2,7 @@
 <html>
   <head>
     <script type="text/javascript" src="d3.min.js"></script>
-    <script src="test_js.js"></script>
+    <script src="k_means.js"></script>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
@@ -10,21 +10,15 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
   </head>
   <body>
-    <div class="c">
-      <svg class="chart" width=600 height=600>
-</svg>
+    <div class="c svg-container" display="inline-block" position="relative" padding-bottom="100%" vertical-align="top" overflow="hidden">
+
     </div>
     <div class="b">
-      <p id="clusternumber">Number of clusters: 2</p>
       <button type="button" class="clusterButton"id="addcluster"><i class="material-icons">add</i></button>
       <button type="button" class="clusterButton"id="removecluster"><i class="material-icons">remove</i></button>
-      <form action="">
-        <input type="radio" name="start" value="random" checked="checked">Random<br>
-        <input type="radio" name="start" value="k++">K++<br>
-        <input type="radio" name="start" value="manual">Manual<br>
-      </form>
+    </div>
+    <div>
       <button type="button" id="startbutton">Start</button>
-      <button type="button" id="nextbutton">Next</button>
     
     </div>
   </body>
