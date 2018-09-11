@@ -1,32 +1,49 @@
-function addCentroid(){
+d3.select("#numclusters")
+  .on("input", function() {
+      d3.select("#numclusterstext")
+        .text(this.value + " centroids")
+    });
+d3.select("#numclusters")
+  .on("change",function(){
+      updateClusters(this.value)
+    });
+
+function updateClusters(num){
+    current = d3.selectAll("path").size()
+    if (num > current){
+        
+        addCentroids(num - current)
+    }
+    else if (num < current){
+        removeCentroids(current - num)
+    }
+};
+
+function addCentroids(n){
     circles = d3.selectAll("circle").data()
     centroids = d3.selectAll("path").data()
         
-    additional = getRandomSelection(circles, 1).map(c => ({
+    additional = getRandomSelection(circles, n).map((c, i) => ({
             "x": c.x, 
             "y": c.y, 
-            "cluster": centroids.length + 1
+            "cluster": centroids.length + i + 1
             })
         )
         
     newData = centroids.concat(additional)
     drawCentroids(newData)   
-    
-    if (newData.length >= 2){
-        makeClickable("#startbutton")
-    }
 };
 
-function removeCentroid(){
+function removeCentroids(n){
     newData = d3.selectAll("path")
             .data()
-            .slice(0, -1)
-          drawCentroids(newData)
-          
-    if (newData.length < 2){
-        makeUnclickable("#startbutton")
-    }
+            .slice(0, -n)
+    drawCentroids(newData)
 };
+
+// function updateCentroids(){
+    // d3.select("#numclusterstext
+// }
 
 function start(){
     makeUnclickable("#addcluster")

@@ -94,10 +94,8 @@ function drawCircs(data) {
       .attr("fill", accent(0))
       .style("fill-opacity", 0.5)
       
-      
     d3.selectAll("circle")
       .transition().duration(1000)
-      // .style("stroke", d => accent(d.cluster))
       .style("stroke", "#f2f2f2")
       .style("fill", d => accent(d.cluster))
       .style("stroke-width", 1)
@@ -108,20 +106,32 @@ function drawCentroids(coords) {
     
     centroids = d3.select(".chart")
       .selectAll("path").data(coords)
-      
-    centroids.exit().remove()
-      
-    cross = d3.symbol().type(d3.symbolCross).size(100)
+    
+    cross = d3.symbol().type(d3.symbolCross).size(100)    
+    
+    centroids.exit()
+      .transition().duration(1000)
+      .attr("transform", "translate(0,0)")
+      .style("opacity", 0)
+      .remove()
+    
     centroids
-      .enter()
+      .transition().duration(1000)
+      .attr("transform", d => getTranslate(d))
+   
+    centroids.enter()
       .append("path")
       .attr("d", cross())
       .style("fill", d => accent(d.cluster))
-      .style("stroke", "black")
       .style("stroke-width", 1)
+      .style("stroke", "black")
+      .style("opacity", 0)
+      .transition().duration(1000)
+      .attr("transform", d => getTranslate(d))
+      .style("opacity", 1)
       
-    d3.selectAll("path").transition().duration(1000)
-      .attr("transform", d => getTranslate(d))  
+
+
 }
 
 function getRandomSelection(arr, n) {
