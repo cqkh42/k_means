@@ -13,9 +13,7 @@ function addCentroid(){
     drawCentroids(newData)   
     
     if (newData.length >= 2){
-        d3.select("#startbutton")
-        .classed("unclickable", false)
-        .classed("clickable", true)
+        makeClickable("#startbutton")
     }
 };
 
@@ -26,18 +24,16 @@ function removeCentroid(){
           drawCentroids(newData)
           
     if (newData.length < 2){
-        d3.select("#startbutton")
-        .classed("unclickable", true)
-        .classed("clickable", false)
+        makeUnclickable("#startbutton")
     }
 };
 
 function start(){
-    numClusters = d3.selectAll("path").size()
-    if (numClusters >= 2){
-        progress()
-    }
-}
+    makeUnclickable("#addcluster")
+    makeUnclickable("#removecluster")
+    progress()
+    
+};
 
 function progress(){
      newData = d3.selectAll("circle")
@@ -48,3 +44,15 @@ function progress(){
           drawCentroids(newCentroids)
 };
 
+function makeClickable(id){
+    d3.select(id)
+      .classed("unclickable", false)
+      .classed("clickable", true)
+    
+}
+
+function makeUnclickable(id){
+    d3.select(id)
+      .classed("unclickable", true)
+      .classed("clickable", false)
+}
