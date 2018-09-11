@@ -103,6 +103,7 @@ function drawCircs(data) {
         
 function drawCentroids(coords) {      
     coords = coords.sort((d,b) => d.cluster > b.cluster)
+    t = d3.transition().duration(1000)
     
     centroids = d3.select(".chart")
       .selectAll("path").data(coords)
@@ -110,13 +111,13 @@ function drawCentroids(coords) {
     cross = d3.symbol().type(d3.symbolCross).size(100)    
     
     centroids.exit()
-      .transition().duration(1000)
+      .transition(t)
       .attr("transform", "translate(0,0)")
       .style("opacity", 0)
       .remove()
     
     centroids
-      .transition().duration(1000)
+      .transition(t)
       .attr("transform", d => getTranslate(d))
    
     centroids.enter()
@@ -126,12 +127,9 @@ function drawCentroids(coords) {
       .style("stroke-width", 1)
       .style("stroke", "black")
       .style("opacity", 0)
-      .transition().duration(1000)
+      .transition(t)
       .attr("transform", d => getTranslate(d))
       .style("opacity", 1)
-      
-
-
 }
 
 function getRandomSelection(arr, n) {
