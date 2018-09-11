@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html style="height:100%;padding:0;margin:0;background-color:#f2f2f2;">
   <head>
     <script type="text/javascript" src="d3.min.js"></script>
     <script src="k_means.js"></script>
+    <script src="listeners.js"></script>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     <title>K Nearest Neighbours</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
   </head>
-  <body>
-    <div class="c svg-container" display="inline-block" position="relative" padding-bottom="100%" vertical-align="top" overflow="hidden">
-
-    </div>
+  <body style="height:100%;padding:0;margin:0;">
+  <svg class="chart" viewBox="0 0 1000 1000" height="75%" width="100%"></svg>
     <div class="b">
-      <button type="button" class="clusterButton"id="addcluster"><i class="material-icons">add</i></button>
-      <button type="button" class="clusterButton"id="removecluster"><i class="material-icons">remove</i></button>
+      <button type="button" class="clusterButton clickable"id="addcluster" onclick="addCentroid()"><i class="material-icons">add</i></button>
+      <button type="button" class="clusterButton clickable"id="removecluster" onclick="removeCentroid()"><i class="material-icons">remove</i></button>
     </div>
     <div>
-      <button type="button" id="startbutton">Start</button>
+      <button type="button" class="unclickable" id="startbutton" onclick="start()"><i class="material-icons">play_arrow</i></button>
     
     </div>
   </body>
-</html>
 </html>

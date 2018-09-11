@@ -1,0 +1,10 @@
+.clickable{
+    cursor: pointer;
+    opacity: 1;
+}
+
+.unclickable{
+    cursor: default;
+    opacity: 0.5;
+    pointer-events: none;
+}

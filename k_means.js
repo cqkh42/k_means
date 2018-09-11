@@ -1,56 +1,39 @@
-var accent = d3.scaleOrdinal(d3.schemeAccent)
+var accent = d3.scaleOrdinal(d3.schemeCategory10)
+var noise = "100"
 
-d3.json("g2-json/g2-2-30.json").then(function(data) {
-    createSVG()
+d3.json("g2-json/g2-2-" + noise + ".json").then(data => doEverything(data));
+
+
+function doEverything(data){
+     data = scaleData(data)
+    // createSVG()
     drawCircs(data)    
 
-    d3.select("#addcluster")
-      .on("click", function(){            
-        circles = d3.selectAll("circle").data()
-        centroids = d3.selectAll("path").data()
-        
-        additional = getRandomSelection(circles, 1).map(c => ({
-                "x": c.x, 
-                "y": c.y, 
-                "cluster": centroids.length + 1
-                })
-            )
-        
-        newData = centroids.concat(additional)
-        drawCentroids(newData)   
-      })
-      
-    d3.select("#removecluster")
-      .on("click", function(){
-          newData = d3.selectAll("path")
-            .data()
-            .slice(0, -1)
-          drawCentroids(newData)
-      });
-      
-    d3.selectAll("#startbutton")
-      .on("click", function(){
-          newData = d3.selectAll("circle")
-            .data()
-            .map(i => findClosestCentroid(i))
-          drawCircs(newData)
-          newCentroids = assignCentroids()
-          drawCentroids(newCentroids)
-          d3.select(this)
-             .text("Next")
-      })
-});
+    // d3.selectAll("#startbutton")
+      // .on("click", function(){
+          // progress()
+          // d3.select(this)
+             // .text("Next")
+      // })
+};
 
-function createSVG(){
-    d3.select(".svg-container")
-      .append("svg")
-      .classed("chart", true)
-      .attr("viewBox", "0 0 1000 1000")
-      .attr("preserveAspectRatio", "xMinYMid meet")
-      .attr("display", "inline-block")
-      .attr("position", "absolute")
-      .attr("top", 0)
-      .attr("left", 0)
+
+
+
+
+function scaleData(data){
+    minX = d3.min(data, d => d.x)
+    maxX = d3.max(data, d => d.x)
+    xScaler = d3.scaleLinear()
+      .domain([minX - 5, maxX + 5])
+      .range([0, 1000])
+    minY = d3.min(data, d => d.y)
+    maxY = d3.max(data, d => d.y)
+    yScaler = d3.scaleLinear()
+      .domain([minY - 5, maxY + 5])
+      .range([0, 1000])
+    data = data.map(i => ({"x": xScaler(i.x), "y": yScaler(i.y), "cluster": 0}))
+    return data
 }
 
 function getTranslate(d){
@@ -73,9 +56,9 @@ function assignCentroids(){
     return newData
 }   
 
-function getDistance(a, b){
-    d_1 = (a.x - b.x)**2
-    d_2 = (a.y - b.y)**2
+function getDistance(p1, p2){
+    d_1 = (p1.x - p2.x)**2
+    d_2 = (p1.y - p2.y)**2
     d_3 = d_1 + d_2
 
     return d_3 ** 0.5
@@ -114,12 +97,13 @@ function drawCircs(data) {
       
     d3.selectAll("circle")
       .transition().duration(1000)
-      .style("stroke", d => accent(d.cluster))
+      // .style("stroke", d => accent(d.cluster))
+      .style("stroke", "#f2f2f2")
       .style("fill", d => accent(d.cluster))
       .style("stroke-width", 1)
 }
         
-function drawCentroids(coords) {
+function drawCentroids(coords) {      
     coords = coords.sort((d,b) => d.cluster > b.cluster)
     
     centroids = d3.select(".chart")
