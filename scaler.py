@@ -22,7 +22,7 @@ for file in Path('unscaled_data').glob('*.json'):
     scaled_x = [round(x, 1) for x in scaled_x]
     scaled_y = [round(y, 1) for y in scaled_y]
     scaled_dict = [
-        {'x': x, 'y': y, 'cluster': 0} for x, y in zip(scaled_x, scaled_y)
+        {'x': x, 'y': y} for x, y in zip(scaled_x, scaled_y)
     ]
     scaled_json = json.dumps(scaled_dict)
     (Path('scaled_data') / file.name).write_text(scaled_json)
