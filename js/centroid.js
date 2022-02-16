@@ -1,4 +1,4 @@
-const cross = d3.symbol().type(d3.symbolCross).size(200)
+const cross = d3.symbol().type(d3.symbolCross).size(1)
 
 
 function relocateCentroids(){
