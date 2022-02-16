@@ -1,4 +1,4 @@
-d3.json("scaled_data/g2-2-40.json").then(
+d3.json("data/scaled/g2-2-40.json").then(
   data => initialPoints(data)).then(_ =>
   updateNumCentroids(2)
 );
